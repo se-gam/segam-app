@@ -1,47 +1,47 @@
-import React, {useEffect} from 'react';
-import {
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-} from 'react-native';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
-import messaging from '@react-native-firebase/messaging';
+import React from 'react';
+import {StyleSheet, View} from 'react-native';
 
-async function onAppBootstrap() {
-  // Register the device with FCM
-  await messaging().registerDeviceForRemoteMessages();
-  // Get the token
-  const token = await messaging().getToken();
-  console.log(token);
-  // Save the token
-  // await postToApi('/users/1234/tokens', {token});
-}
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import HomeScreen from '@screens/HomeScreen';
+import FullStackScreen from '@screens/FullStackScreen';
+import {RootStackParamList} from 'types/types';
+import AppContext from 'AppContext';
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : '#F7F6F5',
-  };
-  useEffect(() => {
-    onAppBootstrap();
-    console.log(Platform.OS);
-  }, []);
-
+  const [isUpdated, setIsUpdated] = React.useState<boolean>(false);
   return (
-    <SafeAreaView style={[backgroundStyle, styles.container]}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor="#F7F6F5"
-      />
-      <Text>ddd</Text>
-    </SafeAreaView>
+    <AppContext.Provider
+      value={{
+        isUpdated,
+        setIsUpdated,
+      }}>
+      <View style={styles.container}>
+        <NavigationContainer>
+          <Stack.Navigator
+            screenOptions={{
+              animation: 'none',
+              headerShown: false,
+            }}>
+            <Stack.Screen name="Home" component={HomeScreen} />
+            <Stack.Group
+              screenOptions={{
+                headerShown: false,
+                animation: 'slide_from_right',
+              }}>
+              <Stack.Screen name="FullStack" component={FullStackScreen} />
+            </Stack.Group>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </View>
+    </AppContext.Provider>
   );
 }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FCFCFC',
   },
 });
 
