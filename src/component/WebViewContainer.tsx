@@ -17,7 +17,9 @@ function WebViewContainer({
   navigation: any;
   containerStyle?: ViewStyle;
 }) {
-  const [currentUrl, setCurrentUrl] = useState<string>(url);
+  const [currentUrl, setCurrentUrl] = useState({
+    uri: url,
+  });
   const {isUpdated, setIsUpdated} = useContext(AppContext) || {}; // Add null check
   const requestIOSUserPermission = async () => {
     const authStatus = await messaging().requestPermission();
@@ -41,7 +43,6 @@ function WebViewContainer({
       return requestAndroidUserPermission();
     }
   };
-
   const requestOnMessage = async (e: WebViewMessageEvent): Promise<void> => {
     const nativeEvent = JSON.parse(e.nativeEvent.data);
     switch (nativeEvent.type) {
@@ -73,13 +74,17 @@ function WebViewContainer({
         return;
       case 'PERMISSION':
         await requestUserPermission();
-        setCurrentUrl(nativeEvent.path);
+        await getToken();
+        setCurrentUrl({
+          uri: nativeEvent.path,
+        });
         return;
       case 'LOGOUT':
-        setCurrentUrl(nativeEvent.path);
+        setCurrentUrl({
+          uri: nativeEvent.path,
+        });
         CookieManager.clearAll();
         return;
-
       default:
         return;
     }
@@ -94,9 +99,7 @@ function WebViewContainer({
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
       <WebView
-        source={{
-          uri: currentUrl,
-        }}
+        source={currentUrl}
         ref={ref}
         style={styles.container}
         onMessage={requestOnMessage}
@@ -104,6 +107,7 @@ function WebViewContainer({
         sharedCookiesEnabled={true}
         scrollEnabled={false}
         overScrollMode="never"
+        hideKeyboardAccessoryView={true}
       />
     </KeyboardAvoidingView>
   );

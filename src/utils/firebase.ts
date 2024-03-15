@@ -5,9 +5,6 @@ import {Platform} from 'react-native';
 
 export const getToken = async () => {
   try {
-    if (!messaging().isDeviceRegisteredForRemoteMessages) {
-      await messaging().registerDeviceForRemoteMessages();
-    }
     const fcmToken = await messaging().getToken();
     const os = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
     CookieManager.set(NEXT_URL, {
