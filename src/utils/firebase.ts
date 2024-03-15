@@ -6,7 +6,6 @@ import {Platform} from 'react-native';
 export const getToken = async () => {
   try {
     const fcmToken = await messaging().getToken();
-    const os = Platform.OS === 'ios' ? 'IOS' : 'ANDROID';
     CookieManager.set(NEXT_URL, {
       name: 'pushToken',
       value: fcmToken,
@@ -14,7 +13,7 @@ export const getToken = async () => {
     });
     CookieManager.set(NEXT_URL, {
       name: 'os',
-      value: os,
+      value: Platform.OS.toUpperCase(),
       path: '/',
     });
   } catch (e) {}

@@ -27,20 +27,20 @@ function WebViewContainer({
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
     if (enabled) {
-      return getToken();
+      await getToken();
     }
   };
   const requestAndroidUserPermission = async () => {
     PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
     );
-    return getToken();
+    await getToken();
   };
   const requestUserPermission = async () => {
     if (Platform.OS === 'ios') {
-      return requestIOSUserPermission();
+      await requestIOSUserPermission();
     } else {
-      return requestAndroidUserPermission();
+      await requestAndroidUserPermission();
     }
   };
   const requestOnMessage = async (e: WebViewMessageEvent): Promise<void> => {
@@ -74,7 +74,6 @@ function WebViewContainer({
         return;
       case 'PERMISSION':
         await requestUserPermission();
-        await getToken();
         setCurrentUrl({
           uri: nativeEvent.path,
         });
